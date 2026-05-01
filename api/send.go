@@ -32,7 +32,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, Response{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
 
 	var req SendRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

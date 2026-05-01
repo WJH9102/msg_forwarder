@@ -26,7 +26,10 @@ type response struct {
 }
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 	m := mailer.New(cfg)
 
 	http.HandleFunc("POST /api/send", func(w http.ResponseWriter, r *http.Request) {

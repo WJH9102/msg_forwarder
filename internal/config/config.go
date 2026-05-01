@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -17,26 +18,28 @@ type Config struct {
 	SenderName   string
 }
 
-func Load() *Config {
+func Load() (*Config, error) {
 	godotenv.Load()
+
+	authToken := os.Getenv("AUTH_TOKEN")
+	smtpUser := os.Getenv("SMTP_USER")
+	smtpPassword := os.Getenv("SMTP_PASSWORD")
+
+	for _, key := range []string{"AUTH_TOKEN", "SMTP_USER", "SMTP_PASSWORD"} {
+		if os.Getenv(key) == "" {
+			return nil, fmt.Errorf("missing required env: %s", key)
+		}
+	}
 
 	return &Config{
 		ServerPort:   envOr("SERVER_PORT", "8080"),
-		AuthToken:    mustEnv("AUTH_TOKEN"),
+		AuthToken:    authToken,
 		SMTPHost:     envOr("SMTP_HOST", "smtp.163.com"),
 		SMTPPort:     envInt("SMTP_PORT", 465),
-		SMTPUser:     mustEnv("SMTP_USER"),
-		SMTPPassword: mustEnv("SMTP_PASSWORD"),
+		SMTPUser:     smtpUser,
+		SMTPPassword: smtpPassword,
 		SenderName:   envOr("SENDER_NAME", "Msg Forwarder"),
-	}
-}
-
-func mustEnv(key string) string {
-	v := os.Getenv(key)
-	if v == "" {
-		panic("missing required env: " + key)
-	}
-	return v
+	}, nil
 }
 
 func envOr(key, fallback string) string {
