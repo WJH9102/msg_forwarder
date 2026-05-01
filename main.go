@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -76,7 +77,11 @@ func main() {
 		writeJSON(w, http.StatusOK, response{Success: true, Message: "email sent to " + req.To})
 	})
 
-	addr := ":" + cfg.ServerPort
+	addr := os.Getenv("PORT")
+	if addr == "" {
+		addr = "8080"
+	}
+	addr = ":" + addr
 	fmt.Printf("msg_forwarder listening on %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
