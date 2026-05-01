@@ -8,6 +8,7 @@ import (
 )
 
 type SendRequest struct {
+	Token   string `json:"token"`
 	To      string `json:"to"`
 	Subject string `json:"subject"`
 	Content string `json:"content"`
@@ -19,37 +20,27 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func NewHandler(mailer *Mailer, token string) http.Handler {
+func NewHandler(mailer *Mailer, cfg *Config) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/send", authMiddleware(sendHandler(mailer), token))
+	mux.HandleFunc("POST /api/send", sendHandler(mailer, cfg))
 	return mux
 }
 
-func authMiddleware(next http.HandlerFunc, token string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
-		bearer := strings.TrimPrefix(auth, "Bearer ")
-		if bearer == "" {
-			bearer = r.URL.Query().Get("token")
-		}
-		if bearer != token {
-			writeJSON(w, http.StatusUnauthorized, Response{
-				Success: false,
-				Message: "invalid or missing token",
-			})
-			return
-		}
-		next(w, r)
-	}
-}
-
-func sendHandler(mailer *Mailer) http.HandlerFunc {
+func sendHandler(mailer *Mailer, cfg *Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SendRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeJSON(w, http.StatusBadRequest, Response{
 				Success: false,
 				Message: "invalid request body",
+			})
+			return
+		}
+
+		if req.Token != cfg.AuthToken {
+			writeJSON(w, http.StatusUnauthorized, Response{
+				Success: false,
+				Message: "invalid token",
 			})
 			return
 		}

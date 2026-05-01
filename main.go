@@ -10,7 +10,7 @@ func main() {
 	cfg := Load()
 
 	mailer := NewMailer(cfg)
-	handler := NewHandler(mailer, cfg.AuthToken)
+	handler := NewHandler(mailer, cfg)
 
 	addr := ":" + cfg.ServerPort
 	fmt.Printf("msg_forwarder listening on %s\n", addr)
