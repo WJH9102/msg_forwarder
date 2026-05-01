@@ -32,7 +32,11 @@ func main() {
 	}
 	m := mailer.New(cfg)
 
-	http.HandleFunc("POST /api/send", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/send", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, response{Success: false, Message: "method not allowed"})
+			return
+		}
 		var req sendRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeJSON(w, http.StatusBadRequest, response{Success: false, Message: "invalid request body"})
