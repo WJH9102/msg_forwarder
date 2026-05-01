@@ -1,0 +1,16 @@
+# Environment
+.env
+.env.local
+.env.production
+
+# Binaries
+/msg_forwarder
+*.exe
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
