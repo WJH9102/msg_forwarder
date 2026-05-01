@@ -28,7 +28,7 @@ func (m *Mailer) Send(to, subject, body string) error {
 		m.cfg.SMTPUser,
 		m.cfg.SMTPPassword,
 	)
-	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: false}
+	dialer.TLSConfig = &tls.Config{ServerName: m.cfg.SMTPHost}
 
 	return dialer.DialAndSend(msg)
 }
