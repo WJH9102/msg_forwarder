@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"os"
@@ -8,29 +8,26 @@ import (
 )
 
 type Config struct {
-	ServerPort string
-	AuthToken  string
-
+	ServerPort   string
+	AuthToken    string
 	SMTPHost     string
 	SMTPPort     int
 	SMTPUser     string
-	SMTPPassword  string
+	SMTPPassword string
 	SenderName   string
 }
 
 func Load() *Config {
 	godotenv.Load()
 
-	port := envOr("SERVER_PORT", "8080")
-
 	return &Config{
-		ServerPort:   port,
+		ServerPort:   envOr("SERVER_PORT", "8080"),
 		AuthToken:    mustEnv("AUTH_TOKEN"),
 		SMTPHost:     envOr("SMTP_HOST", "smtp.163.com"),
 		SMTPPort:     envInt("SMTP_PORT", 465),
 		SMTPUser:     mustEnv("SMTP_USER"),
 		SMTPPassword: mustEnv("SMTP_PASSWORD"),
-		SenderName:  envOr("SENDER_NAME", "Msg Forwarder"),
+		SenderName:   envOr("SENDER_NAME", "Msg Forwarder"),
 	}
 }
 

@@ -1,17 +1,18 @@
-package main
+package mailer
 
 import (
 	"crypto/tls"
 	"fmt"
 
+	"github.com/WJH9102/msg_forwarder/internal/config"
 	"gopkg.in/gomail.v2"
 )
 
 type Mailer struct {
-	cfg *Config
+	cfg *config.Config
 }
 
-func NewMailer(cfg *Config) *Mailer {
+func New(cfg *config.Config) *Mailer {
 	return &Mailer{cfg: cfg}
 }
 
